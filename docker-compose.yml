@@ -1,0 +1,44 @@
+version: '3'
+services: 
+  mail:
+    image: mailhog/mailhog
+    ports:
+      - 8025:8025
+  web_1:
+    build: ./web_1/
+    depends_on: 
+      - db
+    volumes: 
+      - ./html/:/var/www/html/
+      - ./web_1/httpd.conf:/etc/httpd/conf/httpd.conf
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    ports: 
+      - "9000:80"
+      - "3000:3000"
+      - "8000:8000"
+    privileged: true
+    command: /sbin/init
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+     - PMA_ARBITRARY=1
+     - PMA_HOST=db:3306
+     - PMA_USER=root
+     - PMA_PASSWORD=rootroot
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: zoom_system
+      MYSQL_USER: trend
+      MYSQL_PASSWORD: trendtrend
+      MYSQL_ROOT_PASSWORD: rootroot
+      TZ: Asia/Tokyo
+    ports: 
+      - "3306:3306"
+    volumes: 
+      - laravel_data_zoom:/var/lib/mysql
+volumes: 
+  laravel_data_zoom: {}
